@@ -8,6 +8,7 @@ use Signera\Auth;
 use Signera\Db;
 use Signera\Documents;
 use Signera\Http;
+use Signera\Mailer;
 use Signera\HttpError;
 use Signera\Pdf\Certificate;
 use Signera\Personnummer;
@@ -172,7 +173,7 @@ final class DocumentController
         }
         Documents::sendInvite($document, $signer, 'reminded')
             ? Session::flash('success', 'En ny länk har skickats till ' . $signer['email'] . '. Den tidigare länken slutar gälla.')
-            : Session::flash('error', 'Mejlet kunde inte skickas till ' . $signer['email'] . '.');
+            : Session::flash('error', 'Mejlet kunde inte skickas till ' . $signer['email'] . ': ' . Mailer::$lastError);
         Http::redirect('/documents/' . $document['id']);
     }
 

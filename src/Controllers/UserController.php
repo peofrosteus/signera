@@ -80,6 +80,6 @@ final class UserController
         ]);
         $ok
             ? Session::flash('success', 'Inbjudan skickad till ' . $user['email'] . '.')
-            : Session::flash('error', 'Mejlet kunde inte skickas. Kontrollera e-postinställningarna och försök igen.');
+            : Session::flash('error', 'Mejlet kunde inte skickas: ' . Mailer::$lastError . ' Kontrollera mail-inställningarna i config/config.php.');
     }
 }

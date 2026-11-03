@@ -7,6 +7,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 final class Mailer
 {
+    /** Senaste felet från send(), för att kunna visa orsaken för inloggade användare. */
+    public static ?string $lastError = null;
+
     /**
      * Skickar ett mejl renderat från templates/mail/{template}.php.
      * Returnerar false (och loggar) om det inte gick, så att flödet kan fortsätta.
@@ -20,18 +23,24 @@ final class Mailer
             'body' => View::fetch('mail/' . $template, $data),
         ]);
 
+        self::$lastError = null;
         $mail = new PHPMailer(true);
         try {
-            $mail->isSMTP();
-            $mail->Host = (string) App::config('mail.host');
-            $mail->Port = (int) App::config('mail.port');
-            $secure = (string) App::config('mail.secure');
-            $mail->SMTPSecure = $secure;
-            $mail->SMTPAutoTLS = $secure !== '';
-            if ((string) App::config('mail.user') !== '') {
-                $mail->SMTPAuth = true;
-                $mail->Username = (string) App::config('mail.user');
-                $mail->Password = (string) App::config('mail.pass');
+            if (App::config('mail.transport', 'smtp') === 'mail') {
+                $mail->isMail();
+            } else {
+                $mail->isSMTP();
+                $mail->Host = (string) App::config('mail.host');
+                $mail->Port = (int) App::config('mail.port');
+                $mail->Timeout = 20;
+                $secure = (string) App::config('mail.secure');
+                $mail->SMTPSecure = $secure;
+                $mail->SMTPAutoTLS = $secure !== '';
+                if ((string) App::config('mail.user') !== '') {
+                    $mail->SMTPAuth = true;
+                    $mail->Username = (string) App::config('mail.user');
+                    $mail->Password = (string) App::config('mail.pass');
+                }
             }
             $mail->CharSet = PHPMailer::CHARSET_UTF8;
             $mail->setFrom((string) App::config('mail.from'), (string) App::config('mail.from_name', 'Signera'));
@@ -46,6 +55,7 @@ final class Mailer
             $mail->send();
             return true;
         } catch (\Throwable $e) {
+            self::$lastError = $mail->ErrorInfo !== '' ? $mail->ErrorInfo : $e->getMessage();
             error_log('Mailer: kunde inte skicka till ' . $toEmail . ': ' . $mail->ErrorInfo . ' ' . $e->getMessage());
             return false;
         }

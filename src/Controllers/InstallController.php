@@ -42,7 +42,19 @@ final class InstallController
             return;
         }
 
-        $id = self::createAdmin($name, $email, $password);
+        try {
+            $id = self::createAdmin($name, $email, $password);
+        } catch (\PDOException $e) {
+            // Sidan är skyddad av install_token, så det är ok att visa databasfelet här.
+            error_log('Installation: ' . $e->getMessage());
+            View::render('install', [
+                'title' => 'Installation',
+                'token' => $token,
+                'errors' => ['Databasfel: ' . $e->getMessage() . ' Kontrollera db-inställningarna i config/config.php.'],
+                'old' => compact('name', 'email'),
+            ]);
+            return;
+        }
         Auth::login(Db::one('SELECT * FROM users WHERE id = ?', [$id]));
         Session::flash('success', 'Installationen är klar. Ta bort install_token från config/config.php.');
         Http::redirect('/');

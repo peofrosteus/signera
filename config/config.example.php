@@ -16,6 +16,8 @@ return [
     ],
 
     'mail' => [
+        // 'smtp' (rekommenderas) eller 'mail' för PHP:s mail()-funktion om SMTP inte fungerar från servern.
+        'transport' => 'smtp',
         // one.com: send.one.com, port 465 med ssl. Lokalt med Mailpit: localhost, 1025, secure ''.
         'host' => 'send.one.com',
         'port' => 465,

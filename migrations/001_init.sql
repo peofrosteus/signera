@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(190) NOT NULL,
     email VARCHAR(190) NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE users (
     KEY idx_users_token (token_hash)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE documents (
+CREATE TABLE IF NOT EXISTS documents (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     public_id CHAR(16) NOT NULL,
     title VARCHAR(255) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE documents (
     CONSTRAINT fk_documents_user FOREIGN KEY (created_by) REFERENCES users (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE signers (
+CREATE TABLE IF NOT EXISTS signers (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     document_id INT UNSIGNED NOT NULL,
     position INT UNSIGNED NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE signers (
     CONSTRAINT fk_signers_document FOREIGN KEY (document_id) REFERENCES documents (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE audit_log (
+CREATE TABLE IF NOT EXISTS audit_log (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     document_id INT UNSIGNED NULL,
     signer_id INT UNSIGNED NULL,
@@ -67,7 +67,7 @@ CREATE TABLE audit_log (
     KEY idx_audit_signer_event (signer_id, event, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE login_attempts (
+CREATE TABLE IF NOT EXISTS login_attempts (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     ip VARCHAR(45) NOT NULL,
     email VARCHAR(190) NOT NULL,
