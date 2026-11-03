@@ -1,0 +1,16 @@
+# Lokal utveckling: MySQL + Mailpit (fångar mejl, webbgränssnitt på http://localhost:8025)
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: signera
+      MYSQL_USER: signera
+      MYSQL_PASSWORD: signera
+    ports:
+      - "3307:3306"
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"

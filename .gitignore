@@ -1,0 +1,9 @@
+/vendor/*
+!/vendor/.htaccess
+/config/config.php
+/storage/originals/*
+/storage/signed/*
+/storage/logs/*
+!/storage/**/.gitkeep
+/.claude/
+*.phar

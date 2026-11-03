@@ -1,0 +1,29 @@
+{
+    "name": "frosteus/signera",
+    "description": "Digital signering av PDF-dokument via e-postlänk",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1",
+        "ext-pdo": "*",
+        "ext-openssl": "*",
+        "phpmailer/phpmailer": "^6.9",
+        "setasign/fpdi": "^2.6",
+        "tecnickcom/tcpdf": "^6.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Signera\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "config": {
+        "platform": {
+            "php": "8.1.0"
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
