@@ -8,10 +8,10 @@ final class View
     /** Renderar en mall inuti templates/layout.php. */
     public static function render(string $template, array $data = []): void
     {
+        $data += ['user' => self::currentUser()];
         $content = self::fetch($template, $data);
         echo self::fetch('layout', $data + [
             'content' => $content,
-            'user' => self::currentUser(),
             'flash' => Session::takeFlash(),
         ]);
     }

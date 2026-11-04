@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Signera\Pdf;
 
-use setasign\Fpdi\Tcpdf\Fpdi;
 use Signera\App;
 use Signera\Personnummer;
 
@@ -27,7 +26,20 @@ final class Certificate
     /** Skapar originalet plus en sista sida med signeringsintyget och skriver till $target. */
     public static function build(array $document, array $signers, array $creator, string $source, string $target): void
     {
+        // Första körningen räknar sidorna (intyget kan bli flera sidor) så att sidfoten kan visa "Sida x av y".
+        $total = self::render($document, $signers, $creator, $source, 0)->getNumPages();
+        self::render($document, $signers, $creator, $source, $total)->Output($target, 'F');
+    }
+
+    private static function render(array $document, array $signers, array $creator, string $source, int $totalPages): StampedPdf
+    {
         $pdf = self::newPdf();
+        $pdf->stamp = sprintf(
+            'Signerat elektroniskt · Dokument-ID %s · SHA-256 (original) %s',
+            $document['public_id'],
+            $document['sha256']
+        );
+        $pdf->totalPages = $totalPages;
         $pdf->SetTitle($document['title']);
         $pdf->SetCreator((string) App::config('app_name', 'Signera'));
 
@@ -44,15 +56,14 @@ final class Certificate
         $pdf->SetY(18);
         $pdf->SetFont('dejavusans', '', 10);
         $pdf->writeHTML(self::html($document, $signers, $creator), true, false, true);
-
-        $pdf->Output($target, 'F');
+        $pdf->lastPage();
+        return $pdf;
     }
 
-    private static function newPdf(): Fpdi
+    private static function newPdf(): StampedPdf
     {
-        $pdf = new Fpdi();
+        $pdf = new StampedPdf();
         $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
         $pdf->SetAutoPageBreak(true, 18);
         return $pdf;
     }
@@ -101,6 +112,7 @@ final class Certificate
 </table>
 <p style="font-size:8.5pt;color:#555">Varje undertecknare har fått en personlig länk till sin e-postadress, läst dokumentet,
 bekräftat de fyra sista siffrorna i sitt personnummer och därefter aktivt valt att signera.
+Varje sida i dokumentet är märkt med dokument-ID och originalets SHA-256.
 Tidpunkter anges i {$tz}.</p>
 HTML;
     }
